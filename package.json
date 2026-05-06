@@ -1,6 +1,6 @@
 {
   "name": "errflow",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lightweight error monitoring for Node.js applications",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -23,7 +23,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "error",
@@ -40,16 +41,16 @@
     "logging",
     "apm"
   ],
-  "author": "",
+  "author": "Sameh Dheir",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ٍSamehDheir/errflow.git"
+    "url": "git+https://github.com/SamehDheir/errflow.git"
   },
   "bugs": {
-    "url": "https://github.com/ٍSamehDheir/errflow/issues"
+    "url": "https://github.com/SamehDheir/errflow/issues"
   },
-  "homepage": "https://github.com/ٍSamehDheir/errflow#readme",
+  "homepage": "https://github.com/SamehDheir/errflow#readme",
   "devDependencies": {
     "@types/node": "^20.0.0",
     "tsup": "^8.0.0",
