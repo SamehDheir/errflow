@@ -1,20 +1,20 @@
 {
   "name": "errflow",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Lightweight error monitoring for Node.js applications",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.js"
     },
     "./monitor": {
+      "types": "./dist/monitor.d.ts",
       "import": "./dist/monitor.mjs",
-      "require": "./dist/monitor.js",
-      "types": "./dist/monitor.d.ts"
+      "require": "./dist/monitor.js"
     }
   },
   "files": [

@@ -35,7 +35,7 @@ function buildPayload(error: Error, metadata?: Record<string, unknown>) {
 
   return {
     message: error.message,
-    stack: error.stack,
+    stack: error.stack ?? `Error: ${error.message}`, 
     environment: config.ERRFLOW_ENV,
     timestamp: new Date().toISOString(),
     runtime: {
@@ -49,6 +49,8 @@ function buildPayload(error: Error, metadata?: Record<string, unknown>) {
     metadata,
   };
 }
+let listenersAttached = false;
+
 
 export async function captureError(error: Error, metadata?: Record<string, unknown>): Promise<void> {
   if (isDisabled()) {
@@ -72,6 +74,9 @@ export async function captureError(error: Error, metadata?: Record<string, unkno
 }
 
 export function attachGlobalListeners(): void {
+  if (listenersAttached) return;
+  listenersAttached = true;
+
   process.on('uncaughtException', (error: Error) => {
     console.error('[errflow] Uncaught exception:', error.message);
     captureError(error).catch(() => {});
@@ -84,4 +89,3 @@ export function attachGlobalListeners(): void {
   });
 }
 
-attachGlobalListeners();

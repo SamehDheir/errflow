@@ -16,9 +16,9 @@ interface ErrorPayload {
   metadata?: Record<string, unknown>;
 }
 
-const TIMEOUT_MS = 5000;
+const TIMEOUT_MS = 30000;
 const MAX_RETRIES = 3;
-const RETRY_DELAYS = [1000, 2000, 4000];
+const RETRY_DELAYS = [3000, 6000, 12000];
 
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -50,35 +50,32 @@ export async function sendError(payload: ErrorPayload): Promise<void> {
     'User-Agent': `errflow/1.0.0 (node/${process.version})`,
   };
 
+  let lastError: string = '';
+
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
       const response = await fetchWithTimeout(
         apiUrl,
-        {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(payload),
-        },
-        TIMEOUT_MS
+        { method: 'POST', headers, body: JSON.stringify(payload) },
+        TIMEOUT_MS,
       );
 
       if (response.ok) {
-        return;
+        console.log(`[errflow] Sent successfully on attempt ${attempt + 1}`);
+        return; 
       }
 
-      console.warn(`[errflow] Attempt ${attempt + 1} failed with status ${response.status}`);
-
-      if (attempt < MAX_RETRIES - 1) {
-        await sleep(RETRY_DELAYS[attempt]);
-      }
+      lastError = `status ${response.status}`;
+      console.warn(`[errflow] Attempt ${attempt + 1} failed with ${lastError}`);
     } catch (error) {
-      console.warn(`[errflow] Attempt ${attempt + 1} failed:`, error instanceof Error ? error.message : String(error));
-      if (attempt < MAX_RETRIES - 1) {
-        await sleep(RETRY_DELAYS[attempt]);
-      }
+      lastError = error instanceof Error ? error.message : String(error);
+      console.warn(`[errflow] Attempt ${attempt + 1} failed:`, lastError);
+    }
+
+    if (attempt < MAX_RETRIES - 1) {
+      await sleep(RETRY_DELAYS[attempt]);
     }
   }
 
-  console.error(`[errflow] Failed to send error after ${MAX_RETRIES} attempts`);
-  throw new Error(`Failed to send error after ${MAX_RETRIES} attempts`);
+  throw new Error(`Failed to send error after ${MAX_RETRIES} attempts: ${lastError}`);
 }
